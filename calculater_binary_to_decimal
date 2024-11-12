@@ -1,0 +1,47 @@
+def decimal_to_binary(decimal):
+    return bin(decimal)[2:]
+def decimal_to_hexadecimal(decimal):
+    return hex(decimal)[2:]
+def decimal_to_octal(decimal):
+    return oct(decimal)[2:]
+def binary_to_decimal(binary):
+    return int(binary,2)
+def hexadecimal_to_decimal(hexadecimal):
+    return int(hexadecimal,16)
+def octal_to_decimal(octal):
+    return int(octal,8)
+def calculator():
+    print("Welcome to the number conversion calculator!")
+    print("choose the number type: ")
+    print("1.binary")
+    print("2.decimal")
+    print("3.hexadecimal")
+    print("4.octal")
+    choice=int(input("Enter your choice 1-4:"))
+    if choice==1:
+        binary=input("Enter your binary number:")
+        decimal=binary_to_decimal(binary)
+        print("decimal",decimal)
+        print("Hexadecimal:",decimal_to_hexadecimal(decimal))
+        print("octal:",decimal_to_octal(decimal))
+    elif choice==2:
+        decimal=int(input("Enter your decimal number:"))
+        print("binary:",decimal_to_binary(decimal))
+        print("Hexadecimal:",decimal_to_hexadecimal(decimal))
+        print("octal:",decimal_to_octal)
+    elif choice==3:
+        hexadecimal=input("Enter your Hexadecimal number:")
+        decimal=hexadecimal_to_decimal(decimal)
+        print("binary:",decimal_to_binary(decimal))
+        print("octal:",decimal_to_octal(decimal))
+        print("decimal:",decimal)
+    elif choice==4:
+        octal=input("Enter your octal number: ")
+        decimal=octal_to_decimal(octal)
+        print("binary:",decimal_to_binary(decimal))
+        print("decimal:",decimal)
+        print("hexadecimal:",decimal_to_hexadecimal(decimal))
+    else:
+        print("Enter the valid choice,Please select number choice 1-4: ")
+calculator()
+        

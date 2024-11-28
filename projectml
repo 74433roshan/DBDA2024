@@ -1,0 +1,197 @@
+# Importing Required Libraries
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+import matplotlib.pyplot as plt
+
+# Define Paths for Dataset
+train_dir = 'dataset/train'
+test_dir = 'dataset/test'
+
+# Data Preprocessing
+train_datagen = ImageDataGenerator(
+    rescale=1.0/255,       # Normalize pixel values to [0, 1]
+    rotation_range=30,     # Randomly rotate images
+    width_shift_range=0.2, # Shift images horizontally
+    height_shift_range=0.2,# Shift images vertically
+    shear_range=0.2,       # Shear transformations
+    zoom_range=0.2,        # Zoom in/out
+    horizontal_flip=True,  # Flip images horizontally
+    fill_mode='nearest'    # Fill empty pixels with nearest values
+)
+
+test_datagen = ImageDataGenerator(rescale=1.0/255)  # Only normalize test data
+
+# Load Data from Directories
+train_generator = train_datagen.flow_from_directory(
+    train_dir,
+    target_size=(128, 128),  # Resize all images to 128x128
+    batch_size=32,           # Number of images per batch
+    class_mode='categorical' # Multi-class classification
+)
+
+test_generator = test_datagen.flow_from_directory(
+    test_dir,
+    target_size=(128, 128),
+    batch_size=32,
+    class_mode='categorical'
+)
+
+# Define CNN Model
+model = Sequential([
+    Conv2D(32, (3, 3), activation='relu', input_shape=(128, 128, 3)),  # Input layer
+    MaxPooling2D((2, 2)),  # Reduce spatial dimensions
+    Conv2D(64, (3, 3), activation='relu'),
+    MaxPooling2D((2, 2)),
+    Conv2D(128, (3, 3), activation='relu'),
+    MaxPooling2D((2, 2)),
+    Flatten(),  # Flatten feature maps to a 1D vector
+    Dense(128, activation='relu'),  # Fully connected layer
+    Dropout(0.5),  # Dropout to reduce overfitting
+    Dense(train_generator.num_classes, activation='softmax')  # Output layer
+])
+
+# Compile the Model
+model.compile(
+    optimizer='adam',                      # Adam optimizer
+    loss='categorical_crossentropy',       # Loss function for multi-class classification
+    metrics=['accuracy']                   # Track accuracy
+)
+
+# Train the Model
+history = model.fit(
+    train_generator,
+    epochs=10,                # Number of training epochs
+    validation_data=test_generator
+)
+
+# Evaluate the Model
+test_loss, test_accuracy = model.evaluate(test_generator)
+print(f"Test Accuracy: {test_accuracy * 100:.2f}%")
+
+# Save the Model
+model.save('plant_disease_cnn_model.h5')
+print("Model saved as 'plant_disease_cnn_model.h5'.")
+
+# Plot Training vs Validation Accuracy
+plt.plot(history.history['accuracy'], label='Training Accuracy')
+plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.title('Training and Validation Accuracy')
+plt.show()
+
+# Plot Training vs Validation Loss
+plt.plot(history.history['loss'], label='Training Loss')
+plt.plot(history.history['val_loss'], label='Validation Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Loss')
+plt.legend()
+plt.title('Training and Validation Loss')
+plt.show()
+
+
+===========================================================================================================================================
+
+
+code for plant_disease_model
+# Import necessary libraries
+import tensorflow as tf
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+from tensorflow.keras.optimizers import Adam
+import matplotlib.pyplot as plt
+
+# Set up paths
+train_dir = 'dataset/train'
+test_dir = 'dataset/test'
+
+# Data Preprocessing
+train_datagen = ImageDataGenerator(
+    rescale=1.0/255,
+    rotation_range=30,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    shear_range=0.2,
+    zoom_range=0.2,
+    horizontal_flip=True,
+    fill_mode='nearest'
+)
+
+test_datagen = ImageDataGenerator(rescale=1.0/255)
+
+train_generator = train_datagen.flow_from_directory(
+    train_dir,
+    target_size=(128, 128),
+    batch_size=32,
+    class_mode='categorical'
+)
+
+test_generator = test_datagen.flow_from_directory(
+    test_dir,
+    target_size=(128, 128),
+    batch_size=32,
+    class_mode='categorical'
+)
+
+# Build the Model
+model = Sequential([
+    Conv2D(32, (3, 3), activation='relu', input_shape=(128, 128, 3)),
+    MaxPooling2D((2, 2)),
+    Conv2D(64, (3, 3), activation='relu'),
+    MaxPooling2D((2, 2)),
+    Conv2D(128, (3, 3), activation='relu'),
+    MaxPooling2D((2, 2)),
+    Flatten(),
+    Dense(128, activation='relu'),
+    Dropout(0.5),
+    Dense(train_generator.num_classes, activation='softmax')
+])
+
+# Compile the Model
+model.compile(
+    optimizer=Adam(learning_rate=0.001),
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# Train the Model
+history = model.fit(
+    train_generator,
+    epochs=10,
+    validation_data=test_generator
+)
+
+# Evaluate the Model
+test_loss, test_accuracy = model.evaluate(test_generator)
+print(f"Test Accuracy: {test_accuracy * 100:.2f}%")
+
+# Save the Model
+model.save('plant_disease_model.h5')
+
+# Plot Training and Validation Accuracy
+plt.plot(history.history['accuracy'], label='Training Accuracy')
+plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.show()
+
+# Prediction Example
+import numpy as np
+from tensorflow.keras.preprocessing import image
+
+# Load an image for prediction
+img_path = 'path_to_test_image.jpg'
+img = image.load_img(img_path, target_size=(128, 128))
+img_array = image.img_to_array(img) / 255.0
+img_array = np.expand_dims(img_array, axis=0)
+
+# Predict
+prediction = model.predict(img_array)
+predicted_class = np.argmax(prediction)
+class_indices = {v: k for k, v in train_generator.class_indices.items()}
+print(f"Predicted Class: {class_indices[predicted_class]}")
